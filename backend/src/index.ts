@@ -1,15 +1,34 @@
 import { Hono } from 'hono'
 import { PrismaClient } from '@prisma/client/edge'
-import { withAccelerate } from '@prisma/extension-accelerate'
-import {sign} from 'hono/jwt'
+import {sign,verify} from 'hono/jwt'
 import { jwt } from 'hono/jwt'
+import { withAccelerate } from '@prisma/extension-accelerate';
 
 const app = new Hono<{
   Bindings: {
       DATABASE_URL: string
       JWT_SECRET: string,
+  },
+  Variables : {
+    userId: string
   }
 }>()
+//* means this route and anything dynamic after that
+app.use('/api/v1/blog/*', async (c, next) => {
+  const header = c.req.header('authorisation') || "";
+  const token = header.split(" ");
+  //@ts-ignore //auth header we get in form of Bearer JWT_TOKEN
+  const response = await verify(token,c.env.JWT_SECRET)
+  if(response.id) {
+    next() //we created a token with id we will verify it with the same
+  }
+  else {
+    c.status(401)
+    return c.json({
+      error: "unauthorised access"
+    })
+  }
+})
 
 app.post('/api/v1/signup', async(c) => {
   const prisma = new PrismaClient({
