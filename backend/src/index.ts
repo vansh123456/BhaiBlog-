@@ -13,21 +13,25 @@ const app = new Hono<{
     userId: string
   }
 }>()
+
+
 //* means this route and anything dynamic after that
 app.use('/api/v1/blog/*', async (c, next) => {
-  const header = c.req.header('authorisation') || "";
-  const token = header.split(" ");
-  //@ts-ignore //auth header we get in form of Bearer JWT_TOKEN
-  const response = await verify(token,c.env.JWT_SECRET)
-  if(response.id) {
-    next() //we created a token with id we will verify it with the same
-  }
-  else {
-    c.status(401)
-    return c.json({
-      error: "unauthorised access"
-    })
-  }
+  app.use('/api/v1/blog/*', async (c, next) => {
+    const jwt = c.req.header('Authorization');
+    if (!jwt) {
+      c.status(401);
+      return c.json({ error: "unauthorized" });
+    }
+    const token = jwt.split(' ')[1];
+    const payload = await verify(token, c.env.JWT_SECRET);
+    if (!payload) {
+      c.status(401);
+      return c.json({ error: "unauthorized" });
+    }
+    c.set('userId', payload.id);
+    await next()
+  })
 })
 
 app.post('/api/v1/signup', async(c) => {
