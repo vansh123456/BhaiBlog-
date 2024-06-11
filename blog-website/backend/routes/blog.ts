@@ -13,6 +13,30 @@ export const blogRouter = new Hono<{
     }
 }>();
 
+//introduce middleware
+//basically checks for the auth header then allows to the user to use the blog endpoints
+blogRouter.use("/*", async (c, next) => {
+    const authHeader = c.req.header("authorization") || ""; //added blank space to fix ts error,of it being string|| undefined
+    try {
+        const user = await verify(authHeader, c.env.JWT_SECRET);
+        if (user) {
+            //@ts-ignore
+            c.set("userId", user.id); //set is used to pass values from the middleware to the actuall route handler
+            await next(); //add await for next for it to move to next
+        } else {
+            c.status(403);
+            return c.json({
+                message: "You are not logged in"
+            })
+        }
+    } catch(e) {
+        c.status(403);
+        return c.json({
+            message: "You are not logged in"
+        })
+    }
+});
+
 blogRouter.post('/', async (c) => {
     const body = await c.req.json();
     const authorId = c.get("userId");
@@ -54,6 +78,9 @@ blogRouter.put('/', async (c) => {
     })
 })
 
+
+//we are writing this /bulk before the other endpoint as awaiting the next() control was not reaching here
+//so we have defined it upwards so control should reach here if it is not called then it hits the next endpoint downwards
 // Todo: add pagination
 blogRouter.get('/bulk', async (c) => {
     const prisma = new PrismaClient({
