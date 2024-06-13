@@ -2,13 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom"
 import { SignupInput } from "@vansh123456/medium-common";
 
-export const Auth =({type} : {type: "signup" | "signin"}) => {
-
-    const [postInputs,setPostInputs] = useState<SignupInput>({
+export const Auth = ({ type }: { type: "signup" | "signin" }) => {
+    const [postInputs, setPostInputs] = useState<SignupInput>({
         name: "",
         username: "",
         password: ""
-    })
+    });
     return <div className="h-screen flex justify-center flex-col">
         <div className="flex justify-center">
         <div className="pt-10">
@@ -22,12 +21,12 @@ export const Auth =({type} : {type: "signup" | "signin"}) => {
                 </div>
         </div>
         <div>
-       <LabelledInput label="Name" placeholder="John" onChange={(e) => {
+       {type === "signup" ? <LabelledInput label = "Name" placeholder="John" onChange={(e) => {
             setPostInputs({
                 ...postInputs, //...postInputs directly just copies previous values to new values and 
                 name: e.target.value //nai values ko update kardeta hai
             })
-        }}/> 
+        }}/> : null}
         </div>
         <div><LabelledInput label="Username" placeholder="john@1234" onChange={(e) => {
             setPostInputs({
