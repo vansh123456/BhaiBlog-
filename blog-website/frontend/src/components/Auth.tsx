@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { Link } from "react-router-dom"
+import { ChangeEvent,useState } from "react";
+import { Link, useNavigate } from "react-router-dom"
 import { SignupInput } from "@vansh123456/medium-common";
+import axios from "axios";
+import { BACKEND_URL } from "../config";
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     const [postInputs, setPostInputs] = useState<SignupInput>({
@@ -8,6 +10,21 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
         username: "",
         password: ""
     });
+    const navigate = useNavigate();
+
+    async function sendRequest() {
+        try {
+            const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`,postInputs);
+            const jwt  = response.data //ye jo postman main jo jwt token aata hai na
+            localStorage.setItem("token",jwt);
+            navigate("/blogs")
+        }   
+        catch(e) {
+            console.log(e);
+            alert("error while signing up");
+        }
+    }
+
     return <div className="h-screen flex justify-center flex-col">
         <div className="flex justify-center">
         <div className="pt-10">
@@ -39,24 +56,24 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                 ...postInputs, //...postInputs directly just copies previous values to new values and 
                 password: e.target.value //nai values ko update kardeta hai
             })
-        }}/></div>
+        }}/>
+        <button onClick={sendRequest} type="button" className="mt-8 w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">{type === "signup" ? "Sign up" : "Sign in"}</button>
+        </div>
         </div>
         </div>
     </div>
 }
 
 interface LabelledInputType {
-    label : string;
-    placeholder:string;
-    onChange: any;
-    type? : string;
+    label: string;
+    placeholder: string;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    type?: string;
 }
-function LabelledInput({label,placeholder,onChange,type} : LabelledInputType){
-return <div>
-    <div>
-            <label onChange= {onChange} for="title" class="block mb-2 text-sm font-bold text-black-500 mt-5">{label}</label>
-            <input id="first_name" type= {type || "text"} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder={placeholder} required />
 
-        </div>
-</div>
+function LabelledInput({ label, placeholder, onChange, type }: LabelledInputType) {
+    return <div>
+        <label className="block mb-2 text-sm text-black font-semibold pt-4">{label}</label>
+        <input onChange={onChange} type={type || "text"} id="first_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder={placeholder} required />
+    </div>
 }
