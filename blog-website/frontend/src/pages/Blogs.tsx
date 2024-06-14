@@ -3,8 +3,13 @@ import { BlogCard } from "../components/BlogCard"
 import { useBlogs } from "../hooks"
 
 export const Blogs = () => {
-    const {blogs} = useBlogs();
+    const {loading,blogs} = useBlogs();
 
+    if(loading) {
+        return <div>
+            Loading content please wait
+        </div>
+    }
     return <div>
     <div ><Appbar/></div>
     <div className="flex justify-center">

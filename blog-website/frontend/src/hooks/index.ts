@@ -13,6 +13,7 @@ export interface Blog {
 //custom hooks for displaying all blogs
 export const useBlogs = () => {
     const [blogs,setBlogs] = useState<Blog[]>([]);
+    const [loading,setLoading] = useState(true)
     useEffect(() =>{
         axios.get(`${BACKEND_URL}/api/v1/blog/bulk`,{
             headers: {
@@ -20,9 +21,11 @@ export const useBlogs = () => {
             }
         }).then(response => {
             setBlogs(response.data.blogs);
+            setLoading(false);
         })
     },[])
     return {
-        blogs //state variable is getting returned
+        blogs, //state variable is getting returned
+        loading
     }
 }
