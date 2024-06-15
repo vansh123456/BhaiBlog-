@@ -10,23 +10,27 @@ export interface Blog {
         "name": string
     }
 }
-export const useBlog = ({id} : {id: string}) => {
-    const [blog,setBlog] = useState<Blog[]>([]);
-    const [loading,setLoading] = useState(true)
-    useEffect(() =>{
-        axios.get(`${BACKEND_URL}/api/v1/blog/${id}`,{
+export const useBlog = ({ id }: { id: string }) => {
+    const [loading, setLoading] = useState(true);
+    const [blog, setBlog] = useState<Blog>();
+
+    useEffect(() => {
+        axios.get(`${BACKEND_URL}/api/v1/blog/${id}`, {
             headers: {
                 Authorization: localStorage.getItem("token")
             }
-        }).then(response => {
-            setBlog(response.data.blog);
-            setLoading(false);
         })
-    },[id])
+            .then(response => {
+                setBlog(response.data.blog);
+                setLoading(false);
+            })
+    }, [id])
+
     return {
-        blog, //state variable is getting returned
-        loading
+        loading,
+        blog
     }
+
 }
 
 //custom hooks for displaying all blogs
