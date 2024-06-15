@@ -20,7 +20,6 @@ export const Blog = () => {
         </div>
     }
     return <div>
-        //@ts-ignore
         <FullBlog blog={blog}/>
     </div>
 }
