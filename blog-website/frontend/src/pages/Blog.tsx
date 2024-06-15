@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useBlog } from "../hooks"
 import { Appbar } from "../components/Appbar";
 import { FullBlog } from "../components/FullBlog";
+import { Spinner } from "../components/Spinner";
 
 export const Blog = () => {
     const {id} = useParams(); //get dynamic route parameters
@@ -10,9 +11,11 @@ export const Blog = () => {
     });
     if(loading) {
         return <div>
-            <div><Appbar/></div>
+            <Appbar/>
+            <div className="h-screen flex flex-col justify-center">
             <div className="flex justify-center">
-            loading the content please wait
+            <Spinner/>
+            </div>
         </div>
         </div>
     }
