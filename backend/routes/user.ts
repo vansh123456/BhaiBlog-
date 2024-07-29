@@ -4,6 +4,8 @@ import { withAccelerate } from '@prisma/extension-accelerate'
 import { sign } from "hono/jwt";
 import { signupInput } from "@vansh123456/medium-common";
 import { signinInput } from "@vansh123456/medium-common";
+import bcrypt from 'bcrypt';
+
 
 export const userRouter = new Hono<{
     Bindings: {
@@ -12,10 +14,12 @@ export const userRouter = new Hono<{
     }
 }>();
 
+
 userRouter.post('/signup', async (c) => {
     const body = await c.req.json();
     const { success } = signupInput.safeParse(body);
     console.log(success)
+    const hashedPassword = await bcrypt.hash(body.password,10)
     if (!success) {
         c.status(411);
         return c.json({
@@ -30,7 +34,7 @@ userRouter.post('/signup', async (c) => {
       const user = await prisma.user.create({
         data: {
           username: body.username,
-          password: body.password,
+          password: hashedPassword,
           name: body.name
         }
       })
@@ -48,6 +52,7 @@ userRouter.post('/signup', async (c) => {
   userRouter.post('/signin', async (c) => {
     const body = await c.req.json();
     const { success } = signinInput.safeParse(body);
+    const hashedPassword = await bcrypt.hash(body.password,10)
     if (!success) {
         c.status(411);
         return c.json({
@@ -62,7 +67,7 @@ userRouter.post('/signup', async (c) => {
       const user = await prisma.user.findFirst({
         where: {
           username: body.username,
-          password: body.password,
+          password: bcrypt.compare(body.password,hashedPassword),
         }
       })
       if (!user) {

@@ -7,7 +7,9 @@
     "@100xdevs/medium-common": "^1.0.0",
     "@prisma/client": "^5.15.0",
     "@prisma/extension-accelerate": "^1.1.0",
+    "@types/bcrypt": "^5.0.2",
     "@vansh123456/medium-common": "^1.0.0",
+    "bcrypt": "^5.1.1",
     "hono": "^4.4.5",
     "prisma": "^5.15.0"
   },
